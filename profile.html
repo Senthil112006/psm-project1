@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Verified Intern Profile & Portfolio | PSM InternHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { 
+            ink: '#1e1b4b', 
+            moss: '#7c3aed', 
+            mossDark: '#6d28d9',
+            leaf: '#ede9fe', 
+            paper: '#ffffff', 
+            line: '#e9d5ff', 
+            muted: '#7c749b' 
+          },
+          fontFamily: { 
+            sans: ['DM Sans', 'sans-serif'], 
+            mono: ['DM Mono', 'monospace'] 
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; min-height: 100vh; background: #ffffff; color: #1e1b4b; font-family: 'DM Sans', sans-serif; }
+    .font-mono { font-family: 'DM Mono', monospace; }
+    .card-shadow { box-shadow: 0 4px 20px -2px rgba(124, 58, 237, 0.05), 0 2px 6px -1px rgba(124, 58, 237, 0.03); }
+    @media print {
+      body { background: white !important; color: black !important; }
+      header, footer, .no-print { display: none !important; }
+      main { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+      .card-shadow { box-shadow: none !important; border-color: #ccc !important; }
+      .print-break-inside-avoid { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+  <header class="sticky top-0 z-40 border-b border-line bg-white/90 backdrop-blur">
+    <div class="mx-auto flex h-[68px] max-w-[1100px] items-center justify-between gap-4 px-4 sm:px-7">
+      <a id="homeLink" href="/" class="flex items-center gap-3 group text-decoration-none" title="PSM InternHub">
+        <img id="logoImg" src="/assets/logo.png" onerror="if(!this.src.endsWith('assets/logo.png'))this.src='assets/logo.png'" alt="PSM logo" class="h-10 w-10 rounded-xl object-contain">
+        <span class="leading-tight">
+          <strong class="text-[15px] tracking-tight">Intern<span class="text-moss">Hub</span></strong>
+          <span class="block text-[9px] font-semibold uppercase tracking-[.15em] text-muted">Problem Solving Minds</span>
+        </span>
+      </a>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="shareBtn" onclick="copyProfileLink()" type="button" class="no-print inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-[12px] font-semibold text-ink hover:bg-[#f5f3ff] transition-colors">
+          <i data-lucide="share-2" class="h-3.5 w-3.5 text-moss"></i>
+          <span id="shareBtnText" class="hidden sm:inline">Share Link</span>
+        </button>
+        <button onclick="window.print()" type="button" class="no-print inline-flex items-center gap-1.5 rounded-lg bg-moss px-3 py-2 text-[12px] font-bold text-white hover:bg-mossDark transition-colors shadow-sm">
+          <i data-lucide="printer" class="h-3.5 w-3.5"></i>
+          <span>Print Credential</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 mx-auto w-full max-w-[1100px] px-4 py-8 sm:px-7 sm:py-10">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[.2em] text-moss">Official Student Portfolio & Credential</p>
+        <h1 class="text-[26px] font-extrabold tracking-tight sm:text-[32px] text-ink">Verified Profile Record</h1>
+      </div>
+      <div class="inline-flex items-center gap-1.5 rounded-full border border-[#ddd6fe] bg-[#ede9fe] px-3 py-1 text-[11px] font-bold text-moss">
+        <i data-lucide="shield-check" class="h-4 w-4 text-moss"></i>
+        <span>Authenticated by PSM Evaluation Board</span>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="profileError" class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-800" role="alert">
+      <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-rose-100 mb-3">
+        <i data-lucide="alert-triangle" class="h-6 w-6 text-rose-600"></i>
+      </div>
+      <h2 class="text-base font-bold">Profile Unavailable</h2>
+      <p class="mt-1 text-[13px] text-rose-700">This student profile link is either invalid, expired, or the student ID was not found.</p>
+      <a id="errorHomeLink" href="/" class="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-rose-700 px-4 py-2 text-[12px] font-bold text-white hover:bg-rose-800 transition">Return to InternHub Home</a>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div id="profileSkeleton" class="space-y-4">
+      <div class="h-48 rounded-2xl bg-white/70 animate-pulse border border-line"></div>
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="h-64 rounded-2xl bg-white/70 animate-pulse border border-line md:col-span-2"></div>
+        <div class="h-64 rounded-2xl bg-white/70 animate-pulse border border-line"></div>
+      </div>
+    </div>
+
+    <!-- Main Profile Card -->
+    <article id="profileCard" class="hidden space-y-6">
+      <!-- Hero Banner Card -->
+      <section class="overflow-hidden rounded-2xl border border-line bg-white card-shadow">
+        <div class="grid gap-6 border-b border-line p-6 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-8">
+          <!-- Photo or Monogram Avatar -->
+          <div class="relative shrink-0">
+            <img id="profilePhoto" alt="" class="hidden h-28 w-28 rounded-2xl object-cover ring-2 ring-line shadow-sm sm:h-32 sm:w-32">
+            <div id="profileAvatarFallback" class="grid h-28 w-28 place-items-center rounded-2xl bg-[#ede9fe] text-[32px] font-extrabold text-moss ring-2 ring-line sm:h-32 sm:w-32">
+              <span id="profileAvatarInitials">PS</span>
+            </div>
+            <span id="verifiedCheckPill" class="absolute -bottom-2 -right-2 grid h-7 w-7 place-items-center rounded-full bg-moss text-white shadow-md ring-2 ring-white" title="Verified PSM Credential">
+              <i data-lucide="check" class="h-4 w-4"></i>
+            </span>
+          </div>
+
+          <!-- Identification Details -->
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1 rounded-full bg-[#ede9fe] px-2.5 py-0.5 text-[10px] font-bold text-moss">
+                <i data-lucide="badge-check" class="h-3 w-3"></i> Verified Intern
+              </span>
+              <span id="profileStatusBadge" class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold"></span>
+              <a id="profileGithub" href="#" target="_blank" rel="noopener noreferrer" class="hidden inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-0.5 text-[10px] font-bold text-ink hover:bg-[#f5f3ff] hover:text-moss transition-colors shadow-sm" title="View GitHub Profile">
+                <i data-lucide="github" class="h-3 w-3 text-ink"></i> <span>GitHub</span>
+              </a>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-700">Summer 2026</span>
+            </div>
+
+            <h2 id="profileName" class="mt-2.5 text-[26px] font-extrabold tracking-tight text-ink sm:text-[32px]"></h2>
+            <p class="mt-1 flex flex-wrap items-center gap-2 text-[14px] font-semibold text-moss">
+              <span id="profileRole"></span>
+              <span class="text-muted/60">·</span>
+              <span id="profileId" class="rounded bg-[#faf8ff] px-2 py-0.5 font-mono text-[11px] font-bold text-ink"></span>
+            </p>
+            <p id="profileCollege" class="mt-1 text-[12px] font-medium text-muted"></p>
+
+            <!-- Working Days / Attendance Bar -->
+            <div class="mt-4 max-w-md rounded-xl bg-[#faf8ff] p-3 border border-line/60">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="font-bold text-ink">Sprint Attendance & Days</span>
+                <span id="profileDaysSummary" class="font-mono font-semibold text-moss"></span>
+              </div>
+              <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-[#ede9fe]">
+                <div id="profileAttendanceBar" class="h-full rounded-full bg-moss transition-all duration-700" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Score Card -->
+          <div class="flex flex-col items-start justify-center rounded-xl bg-[#faf8ff] p-5 border border-line sm:items-center sm:border-0 sm:bg-transparent sm:p-0 sm:pl-7 sm:border-l sm:border-line">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-muted">Composite Score</span>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span id="profileScore" class="font-mono text-[42px] font-black leading-none text-ink"></span>
+              <span class="font-mono text-[14px] font-bold text-muted">/100</span>
+            </div>
+            <span id="profileGrade" class="mt-1.5 inline-block rounded-md bg-[#ede9fe] px-2.5 py-1 text-[11px] font-bold text-moss"></span>
+          </div>
+        </div>
+
+        <!-- Capstone Project Section -->
+        <div class="p-6 sm:p-8">
+          <div class="flex items-center justify-between">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-muted">Capstone Project Milestone</p>
+            <span class="rounded bg-[#ede9fe] px-2 py-0.5 text-[10px] font-bold text-moss">Major Submission</span>
+          </div>
+          <h3 id="profileProject" class="mt-2 text-[20px] font-extrabold text-moss sm:text-[22px]"></h3>
+          <p id="profileDescription" class="mt-3 text-[13px] leading-relaxed text-[#4b5952]"></p>
+          <div class="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-muted mb-2">Verified Competencies & Skills</p>
+              <div id="profileSkills" class="flex flex-wrap gap-2"></div>
+            </div>
+            <a id="projectGithub" href="#" target="_blank" rel="noopener noreferrer" class="hidden inline-flex items-center gap-1.5 rounded-lg border border-line bg-[#faf8ff] px-3 py-2 text-[11px] font-bold text-ink hover:bg-[#f5f3ff] hover:text-moss transition-colors shadow-sm">
+              <i data-lucide="github" class="h-4 w-4 text-moss"></i>
+              <span>GitHub Repository</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Details Grid: Evaluation Rubric + Mentor Notes + Verification Seal -->
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Rubric Breakdown -->
+        <section class="rounded-2xl border border-line bg-white p-6 card-shadow md:col-span-2 print-break-inside-avoid">
+          <div class="flex items-center justify-between border-b border-line pb-4">
+            <div>
+              <h4 class="text-[15px] font-extrabold text-ink">Performance Rubric Marks</h4>
+              <p class="text-[11px] text-muted">Official weighted scores awarded across six core engineering domains.</p>
+            </div>
+            <i data-lucide="bar-chart-2" class="h-5 w-5 text-moss"></i>
+          </div>
+
+          <div id="rubricContainer" class="mt-5 grid gap-4 sm:grid-cols-2">
+            <!-- Rubric items inserted by JS -->
+          </div>
+        </section>
+
+        <!-- Official QR Code & Credential Stamp -->
+        <aside class="flex flex-col justify-between rounded-2xl border border-line bg-white p-6 card-shadow print-break-inside-avoid">
+          <div>
+            <div class="flex items-center justify-between border-b border-line pb-3">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-moss">Digital Credential</span>
+              <i data-lucide="qr-code" class="h-4 w-4 text-moss"></i>
+            </div>
+            <p class="mt-3 text-[12px] text-muted leading-relaxed">
+              Scan this unique QR code with any smartphone camera to open and authenticate this student's official live portfolio.
+            </p>
+            
+            <div class="mt-4 flex flex-col items-center justify-center rounded-xl bg-[#faf8ff] p-4 border border-line">
+              <div id="portfolioQrCanvas" class="rounded-lg bg-white p-2 shadow-sm"></div>
+            </div>
+          </div>
+
+          <div class="mt-5 border-t border-line pt-4 text-center">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-muted">Verification Seal</p>
+            <p class="mt-0.5 text-[11px] font-extrabold text-ink">Problem Solving Minds</p>
+            <p class="text-[9px] text-muted">Autonomous Credential Register · 2026</p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Mentor Review Card (if available) -->
+      <section id="mentorSection" class="hidden rounded-2xl border border-line bg-white p-6 sm:p-8 card-shadow print-break-inside-avoid">
+        <div class="flex items-center gap-3 border-b border-line pb-4">
+          <div class="grid h-9 w-9 place-items-center rounded-lg bg-[#ede9fe] text-moss">
+            <i data-lucide="message-square-quote" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <h4 class="text-[15px] font-extrabold text-ink">Mentor Endorsement & Review</h4>
+            <p class="text-[11px] text-muted">Feedback from the designated supervising mentor.</p>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+          <div class="sm:col-span-1 rounded-xl bg-[#faf8ff] p-4 border border-line">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-muted">Supervising Mentor</p>
+            <p id="mentorNameDisplay" class="mt-1 text-[14px] font-bold text-ink"></p>
+            <p id="mentorIdDisplay" class="mt-0.5 font-mono text-[11px] font-medium text-moss"></p>
+          </div>
+          <div class="sm:col-span-2 space-y-3">
+            <div id="mentorReviewContainer" class="rounded-xl bg-[#faf8ff] p-4 border border-[#ddd6fe]">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-moss">Mentor Performance Feedback</p>
+              <p id="mentorReviewDisplay" class="mt-1 text-[13px] leading-relaxed italic text-ink"></p>
+            </div>
+            <div id="mentorEvaluationContainer" class="hidden rounded-xl bg-slate-50 p-4 border border-slate-200">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-600">Evaluation Committee Remarks</p>
+              <p id="mentorEvaluationDisplay" class="mt-1 text-[12px] leading-relaxed text-slate-700"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <footer class="mt-12 border-t border-line bg-white px-4 py-6 text-center text-[11px] text-muted">
+    <div class="mx-auto max-w-[1100px] flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>© 2026 Problem Solving Minds · InternHub Credential Authority</p>
+      <p class="font-mono text-[10px]">Tamper-Resistant Public Profile Standard</p>
+    </div>
+  </footer>
+
+  <!-- Toast notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden rounded-xl bg-ink px-4 py-3 text-[12px] font-bold text-white shadow-xl transition-all">
+    <span id="toastMessage">Link copied to clipboard!</span>
+  </div>
+
+  <script>
+    const gradeDescriptions = { 
+      'A+': 'Outstanding', 
+      A: 'Excellent', 
+      B: 'Very Good', 
+      C: 'Good', 
+      D: 'Satisfactory', 
+      E: 'Needs Improvement' 
+    };
+
+    const rubricMeta = [
+      { key: 'technical', label: 'Technical Skills', weight: '25%' },
+      { key: 'projectQuality', label: 'Project Quality', weight: '25%' },
+      { key: 'problemSolving', label: 'Problem Solving', weight: '20%' },
+      { key: 'taskCompletion', label: 'Task Completion', weight: '15%' },
+      { key: 'communication', label: 'Communication', weight: '10%' },
+      { key: 'teamwork', label: 'Teamwork', weight: '5%' }
+    ];
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+    }
+
+    function copyProfileLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast('Profile URL copied to clipboard!');
+        const text = document.getElementById('shareBtnText');
+        if (text) {
+          text.textContent = 'Copied!';
+          setTimeout(() => { text.textContent = 'Share Link'; }, 2000);
+        }
+      }).catch(() => {
+        showToast('Profile URL: ' + window.location.href);
+      });
+    }
+
+    async function loadProfile() {
+      // 1. Resolve student identifier from query params, hash, or URL pathname
+      const path = window.location.pathname.replace(/\/+$/, '');
+      const pathMatch = path.match(/\/profile\/([^/]+)$/);
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashMatch = window.location.hash.match(/^#(?:intern|profile)=([^&]+)/);
+
+      let identifier = '';
+      if (urlParams.get('id')) {
+        identifier = urlParams.get('id').trim();
+      } else if (urlParams.get('intern')) {
+        identifier = urlParams.get('intern').trim();
+      } else if (hashMatch) {
+        identifier = decodeURIComponent(hashMatch[1]).trim();
+      } else if (pathMatch) {
+        identifier = decodeURIComponent(pathMatch[1]).trim();
+      }
+
+      let profile = null;
+
+      // 2. Try backend API if running with active Node.js server
+      const isStaticHost = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+      if (isStaticHost) {
+        document.getElementById('homeLink')?.setAttribute('href', './');
+        document.getElementById('logoImg')?.setAttribute('src', 'assets/logo.png');
+        document.getElementById('errorHomeLink')?.setAttribute('href', './');
+      }
+
+      if (!isStaticHost && identifier) {
+        try {
+          const response = await fetch(`/api/public-profile/${encodeURIComponent(identifier)}`, { cache: 'no-store' });
+          if (response.ok) {
+            profile = await response.json();
+          }
+        } catch (apiErr) {
+          // Fall through to static fallback
+        }
+      }
+
+      // 3. Fallback to bundled seed data or localStorage (e.g. on GitHub Pages)
+      if (!profile) {
+        let studentsList = [];
+        try {
+          const seedUrl = isStaticHost
+            ? new URL('data/seed-interns.json', window.location.href).href
+            : '/data/seed-interns.json';
+          const res = await fetch(seedUrl, { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.students)) studentsList = data.students;
+          }
+        } catch (seedErr) {}
+
+        if (studentsList.length === 0) {
+          try {
+            const saved = localStorage.getItem('psm-internhub-interns');
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) studentsList = parsed;
+            }
+          } catch (lsErr) {}
+        }
+
+        if (studentsList.length > 0) {
+          if (identifier) {
+            profile = studentsList.find(s => s && typeof s.id === 'string' && s.id.toLowerCase() === identifier.toLowerCase());
+          }
+          if (!profile) {
+            profile = studentsList[0];
+          }
+        }
+      }
+
+      if (!profile) {
+        document.getElementById('profileSkeleton').classList.add('hidden');
+        document.getElementById('profileError').classList.remove('hidden');
+        return;
+      }
+
+      try {
+        document.title = `${profile.name} - ${profile.role} | Verified Intern Portfolio`;
+
+        // Basic Profile Info
+        document.getElementById('profileName').textContent = profile.name;
+        document.getElementById('profileRole').textContent = profile.role;
+        document.getElementById('profileId').textContent = profile.id;
+        document.getElementById('profileCollege').textContent = `${profile.college} · Domain: ${profile.domain}`;
+        
+        // Score & Grade
+        const numericScore = Number(profile.score || 0);
+        document.getElementById('profileScore').textContent = numericScore.toFixed(1);
+        const gradeDesc = gradeDescriptions[profile.grade] || '';
+        document.getElementById('profileGrade').textContent = `Grade ${profile.grade}${gradeDesc ? ' · ' + gradeDesc : ''}`;
+
+        // Status badge
+        const statusBadge = document.getElementById('profileStatusBadge');
+        if (profile.status === 'COMPLETED') {
+          statusBadge.className = 'inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-[10px] font-bold';
+          statusBadge.innerHTML = '<i data-lucide="award" class="h-3 w-3"></i> Certified & Completed';
+        } else {
+          statusBadge.className = 'inline-flex items-center gap-1 rounded-full bg-[#eaf2e8] text-moss px-2.5 py-0.5 text-[10px] font-bold';
+          statusBadge.innerHTML = '<i data-lucide="activity" class="h-3 w-3"></i> Active Sprint Intern';
+        }
+
+        // Attendance Bar
+        const days = Number(profile.days || 0);
+        const total = Math.max(Number(profile.total || 90), 1);
+        const attendancePct = Math.min(Math.round((days / total) * 100), 100);
+        document.getElementById('profileDaysSummary').textContent = `${days} / ${total} days (${attendancePct}%)`;
+        document.getElementById('profileAttendanceBar').style.width = `${attendancePct}%`;
+
+        // Capstone Project
+        document.getElementById('profileProject').textContent = profile.project || 'Capstone Technical Project';
+        document.getElementById('profileDescription').textContent = profile.description || 'Completed assigned technical engineering tasks, project milestones, and peer code reviews.';
+
+        // Skills Tags
+        const skillsContainer = document.getElementById('profileSkills');
+        skillsContainer.replaceChildren();
+        const skillList = Array.isArray(profile.skills) && profile.skills.length ? profile.skills : [profile.domain, 'Problem Solving', 'Engineering'];
+        skillList.forEach(skill => {
+          const tag = document.createElement('span');
+          tag.className = 'rounded-lg bg-[#edf3eb] border border-[#dce8d9] px-3 py-1.5 text-[11px] font-semibold text-moss transition-colors hover:bg-moss hover:text-white';
+          tag.textContent = skill;
+          skillsContainer.append(tag);
+        });
+
+        // GitHub Links
+        const heroGithub = document.getElementById('profileGithub');
+        const projectGithub = document.getElementById('projectGithub');
+        if (profile.github) {
+          if (heroGithub) {
+            heroGithub.href = profile.github;
+            heroGithub.classList.remove('hidden');
+          }
+          if (projectGithub) {
+            projectGithub.href = profile.github;
+            projectGithub.classList.remove('hidden');
+          }
+        } else {
+          if (heroGithub) heroGithub.classList.add('hidden');
+          if (projectGithub) projectGithub.classList.add('hidden');
+        }
+
+        // Photo or Initials Fallback
+        const photo = document.getElementById('profilePhoto');
+        const fallback = document.getElementById('profileAvatarFallback');
+        const initials = document.getElementById('profileAvatarInitials');
+        const nameParts = (profile.name || '').trim().split(/\s+/);
+        initials.textContent = nameParts.length > 1 ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase() : (nameParts[0] ? nameParts[0].slice(0, 2).toUpperCase() : 'PS');
+
+        if (profile.photo) {
+          photo.src = profile.photo;
+          photo.alt = `${profile.name} portrait`;
+          photo.classList.remove('hidden');
+          fallback.classList.add('hidden');
+        } else {
+          photo.classList.add('hidden');
+          fallback.classList.remove('hidden');
+        }
+
+        // Rubric Marks
+        const rubricContainer = document.getElementById('rubricContainer');
+        rubricContainer.replaceChildren();
+        const marks = profile.marks || {};
+        rubricMeta.forEach(({ key, label, weight }) => {
+          const markVal = Number(marks[key] ?? numericScore);
+          const item = document.createElement('div');
+          item.className = 'rounded-xl bg-[#faf8ff] p-3.5 border border-line/80';
+          item.innerHTML = `
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-bold text-ink">${label} <span class="font-mono text-[9px] text-muted">(${weight})</span></span>
+              <span class="font-mono font-bold text-moss">${markVal.toFixed(1)} / 100</span>
+            </div>
+            <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#ede9fe]">
+              <div class="h-full rounded-full bg-moss" style="width: ${Math.min(Math.max(markVal, 0), 100)}%;"></div>
+            </div>
+          `;
+          rubricContainer.append(item);
+        });
+
+        // Mentor Section
+        const hasMentor = Boolean(profile.mentorName || profile.mentorReview || profile.evaluation);
+        const mentorSection = document.getElementById('mentorSection');
+        if (hasMentor) {
+          document.getElementById('mentorNameDisplay').textContent = profile.mentorName || 'Assigned Lead Mentor';
+          document.getElementById('mentorIdDisplay').textContent = profile.mentorId ? `ID: ${profile.mentorId}` : 'PSM Mentorship Team';
+          
+          const reviewText = profile.mentorReview ? `“${profile.mentorReview}”` : 'Demonstrated steady professional growth and completed expected technical deliverables with quality.';
+          document.getElementById('mentorReviewDisplay').textContent = reviewText;
+
+          if (profile.evaluation) {
+            document.getElementById('mentorEvaluationDisplay').textContent = profile.evaluation;
+            document.getElementById('mentorEvaluationContainer').classList.remove('hidden');
+          }
+          mentorSection.classList.remove('hidden');
+        } else {
+          mentorSection.classList.add('hidden');
+        }
+
+        // Render Verification QR Code
+        const qrContainer = document.getElementById('portfolioQrCanvas');
+        qrContainer.replaceChildren();
+        const currentUrl = window.location.href;
+        
+        try {
+          new QRCode(qrContainer, {
+            text: currentUrl,
+            width: 140,
+            height: 140,
+            colorDark: '#1e1b4b',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } catch (qrErr) {
+          console.warn('QR code rendering failed:', qrErr);
+          qrContainer.textContent = 'QR Code';
+        }
+
+        // Show Content
+        document.getElementById('profileSkeleton').classList.add('hidden');
+        document.getElementById('profileCard').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+
+      } catch (error) {
+        console.error('The intern profile could not be loaded.', error);
+        document.getElementById('profileSkeleton').classList.add('hidden');
+        document.getElementById('profileError').classList.remove('hidden');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>
